@@ -63,6 +63,25 @@ warning is **Seen**, **Incomplete**, or **Not seen**.
 
 ![Mandatory government warning check](docs/screenshots/government-warning-detail.jpg)
 
+## Improve from difficult cases
+
+If a match has a low confidence score, looks wrong, or needs a closer look,
+click **JSON** to download that analysis record.
+
+![Export a difficult result as JSON for review](docs/screenshots/json-feedback-export.png)
+
+The export preserves the application fields, OCR evidence, match results, and
+confidence values from that specific case. Save it for review, then have a
+person mark what was correct or incorrect. A downloaded OCR result is not
+training truth by itself: only reviewed and corrected exports should be added
+to an evaluation or training set.
+
+This gives the office a feedback loop based on its own work. A narrow issue can
+be addressed in days, recurring patterns can be collected over weeks, and an
+approved history of difficult cases can support improvements over months. The
+office controls the priorities and timing instead of waiting for a generic
+outside model or vendor update.
+
 ## Layout
 
 - `native/` — C++ analyzer and its bundled headers
