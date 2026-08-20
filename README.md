@@ -90,7 +90,7 @@ outside model or vendor update.
 - `deploy/` — Docker Compose, Dockerfile, and systemd assets
 - `docs/` — operational documentation and screenshots
 
-## Run it on your Mac
+## Run it
 
 You need Python 3.11, CMake, MuPDF, and Tesseract installed first.
 
