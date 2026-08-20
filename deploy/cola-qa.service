@@ -1,0 +1,25 @@
+[Unit]
+Description=COLA Label QA Web App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vpcuser
+WorkingDirectory=/home/vpcuser/cola-qa
+Environment=PORT=8081
+Environment=MAX_UPLOAD_BYTES=52428800
+Environment=MAX_CONCURRENT_ANALYSES=1
+Environment=RUN_RETENTION_HOURS=24
+Environment=CLEANUP_INTERVAL_SECONDS=3600
+ExecStartPre=/usr/bin/test -x /home/vpcuser/cola-qa/bin/cola_label_qa
+ExecStartPre=/usr/bin/test -x /home/vpcuser/cola-qa/.venv/bin/python
+ExecStart=/home/vpcuser/cola-qa/.venv/bin/python -m uvicorn web.app:app --host 0.0.0.0 --port 8081
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

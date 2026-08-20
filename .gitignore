@@ -1,0 +1,16 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+/build/
+/bin/
+web_runs/
+static/
+samples/**/*.pdf
+!samples/demo-cola.pdf
+samples/cola_analysis.json
+.serena/cache/
+.serena/memories/
+.serena/project.local.yml
+*.log

@@ -1,0 +1,19 @@
+services:
+  cola-qa-web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: cola_label_qa_app
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      MAX_CONCURRENT_ANALYSES: "1"
+      RUN_RETENTION_HOURS: "24"
+    volumes:
+      - ../samples:/app/samples:ro
+      - cola-runs:/app/web_runs
+    restart: unless-stopped
+
+volumes:
+  cola-runs:

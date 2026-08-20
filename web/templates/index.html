@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COLA Label QA Workspace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* =========================================
+           RESET & BASE
+           ========================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            background: #f8fafc;
+            color: #111827;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Action Bar */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            height: 48px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: #4f46e5;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .controls-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-input {
+            height: 30px;
+            padding: 0 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #fff;
+            color: #334155;
+            max-width: 220px;
+        }
+
+        .btn-action {
+            height: 30px;
+            padding: 0 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.15s;
+        }
+
+        .btn-verify {
+            background: #4f46e5;
+            color: #ffffff;
+        }
+        .btn-verify:hover {
+            background: #4338ca;
+        }
+
+        .btn-upload-wrap {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-upload-wrap:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-upload-wrap input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Top Info Cards */
+        .top-info-bar {
+            display: flex;
+            gap: 10px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            height: 52px;
+            align-items: center;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .info-card-label {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .info-card-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-card-value.highlight {
+            color: #4f46e5;
+        }
+
+        /* =========================================
+           MAIN WORKSPACE SPLIT
+           ========================================= */
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.9fr) minmax(560px, 1.45fr) minmax(240px, 0.7fr);
+            grid-template-areas: "pdf fields labels";
+            flex: 0 0 auto;
+            align-items: start;
+            min-height: 0;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .pdf-panel {
+            grid-area: pdf;
+            min-width: 0;
+            align-self: start;
+            justify-self: start;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .pdf-panel-header {
+            min-height: 42px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .pdf-panel-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .pdf-viewer-wrap {
+            position: relative;
+            flex: 0 0 auto;
+            width: 100%;
+            aspect-ratio: var(--document-aspect, 918 / 1188);
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .pdf-pages {
+            width: 100%;
+        }
+
+        .document-page-card {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .document-page-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #f8fafc;
+        }
+
+        .form-highlight-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .pdf-empty {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 24px;
+            color: #94a3b8;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .pdf-empty i {
+            font-size: 28px;
+            color: #cbd5e1;
+        }
+
+        /* Left Panel - Compact Width Table */
+        .table-panel {
+            grid-area: fields;
+            align-self: start;
+            width: 100%;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        .table-header {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .table-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tab {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .tab.active {
+            background: #4f46e5;
+            color: #ffffff;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            text-align: left;
+            padding: 8px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+            z-index: 10;
+        }
+
+        thead th:nth-child(1) { width: 40px; text-align: center; } /* ID */
+        thead th:nth-child(2) { width: 1%; white-space: nowrap; }   /* Field Name — shrink to content */
+        thead th:nth-child(3) { }                                     /* Form Value — natural width */
+        thead th:nth-child(4) { }                                     /* OCR Evidence — natural width */
+        thead th:nth-child(5) { width: 1%; white-space: nowrap; }   /* Status — shrink to content */
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* Active Selected Row */
+        tbody tr.selected-row {
+            background: #e0e7ff !important;
+        }
+
+        tbody tr.selected-row .id-btn {
+            background: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 0 0 2px #818cf8;
+        }
+
+        tbody tr.mandatory-row {
+            background: #fff7f7;
+            border-top: 2px solid #ef4444;
+            border-bottom-color: #fecaca;
+        }
+
+        tbody tr.mandatory-row:hover,
+        tbody tr.mandatory-row.selected-row {
+            background: #fee2e2 !important;
+        }
+
+        tbody tr.mandatory-row .id-btn {
+            color: #b91c1c;
+            background: #fff1f2;
+            border-color: #fca5a5;
+        }
+
+        tbody tr.mandatory-row input {
+            background: #fff7f7 !important;
+            border-color: #fecaca !important;
+            color: #991b1b !important;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 6px 10px;
+            vertical-align: middle;
+            height: 40px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px; /* Cap column width, not force it */
+        }
+
+        td:nth-child(1) { text-align: center; }
+        td:nth-child(2) { font-weight: 600; color: #1e293b; font-size: 12px; }
+        td:nth-child(5) { text-align: center; }
+
+        .id-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 24px;
+            border-radius: 4px;
+            background: #eef2ff;
+            color: #4f46e5;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 11px;
+            border: 1px solid #c7d2fe;
+            cursor: pointer;
+            transition: all 0.15s;
+            pointer-events: none; /* Let the row handle the click entirely */
+        }
+
+        td input[type="text"] {
+            width: 100%;
+            height: 26px;
+            padding: 3px 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: inherit;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: #fff;
+            color: #0f172a;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        td input[type="text"].ocr-val {
+            color: #15803d;
+            font-weight: 600;
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        td input[type="text"]:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status-badge.match {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-badge.warn {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.admin {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .status-badge.miss {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-badge.mandatory-seen,
+        .status-badge.mandatory-incomplete,
+        .status-badge.mandatory-missing {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* =========================================
+           RIGHT PANEL - GRID LABEL GALLERY
+           ========================================= */
+        .image-panel {
+            grid-area: labels;
+            align-self: start;
+            width: 100%;
+            max-height: var(--labels-max-height, none);
+            min-width: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 16px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace {
+                grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.78fr);
+                grid-template-rows: auto minmax(180px, 1fr);
+                grid-template-areas:
+                    "pdf fields"
+                    "labels fields";
+            }
+
+            .pdf-panel { border-bottom: 1px solid #e2e8f0; }
+            .image-panel { min-height: 0; border-right: 1px solid #e2e8f0; }
+            .table-container { min-width: 0; }
+            table { table-layout: fixed; }
+            thead th { white-space: normal; }
+            thead th:nth-child(1) { width: 52px; }
+            thead th:nth-child(2) { width: 31%; white-space: normal; }
+            thead th:nth-child(3) { width: 24%; }
+            thead th:nth-child(4) { width: 27%; }
+            thead th:nth-child(5) { width: 70px; white-space: normal; }
+            td { max-width: 0; }
+        }
+
+        @media (max-width: 980px) {
+            body { overflow: auto; }
+            .workspace {
+                display: flex;
+                flex-direction: column;
+                overflow: visible;
+            }
+            .pdf-panel { min-height: 0; width: 100%; align-self: center; flex-shrink: 0; }
+            .table-panel { min-height: 58vh; }
+            .image-panel { min-height: 42vh; overflow: visible; }
+            .top-info-bar { height: auto; flex-wrap: wrap; }
+            .info-card { flex: 1 1 150px; min-width: 140px; }
+        }
+
+        .image-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .image-panel-title {
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #475569;
+        }
+
+        .labels-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .label-card {
+            position: relative;
+            margin-bottom: 12px;
+            align-self: flex-start;
+            height: auto;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .label-card.active-target {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3) !important;
+            background: #faf5ff;
+        }
+
+        .label-card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: monospace;
+            color: #475569;
+            padding: 4px 8px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Container that holds the img + canvas overlay stacked */
+        .label-img-wrap {
+            position: relative;
+            display: block;
+            cursor: zoom-in;
+            border: none;
+            overflow: hidden;
+            background: #fff;
+            width: 100%;
+        }
+
+        .label-img-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 220px;      /* moderate — not tiny, not massive */
+            object-fit: contain;
+            background: #fff;
+        }
+
+        /* Canvas sits exactly on top of the img, same size via absolute positioning */
+        .label-img-wrap canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;  /* clicks fall through to img */
+        }
+
+        /* OCR text chip below the image */
+        .label-ocr-snippet-box {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 11px;
+            font-family: monospace;
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .label-card.active-target .label-ocr-snippet-box {
+            display: block;
+        }
+
+        .ocr-highlight-chip {
+            color: #4ade80;
+            font-weight: 700;
+            background: rgba(34, 197, 94, 0.15);
+            padding: 2px 4px;
+            border-radius: 3px;
+            display: block;
+            margin-top: 4px;
+            word-break: break-word;
+            white-space: normal;
+            border-left: 2px solid #4ade80;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal for zoom */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: zoom-out;
+        }
+
+        .modal img {
+            max-width: 95vw;
+            max-height: 95vh;
+            object-fit: contain;
+        }
+
+        /* Loading banner */
+        .loading-banner {
+            display: none;
+            padding: 6px 16px;
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 12px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Verdict banner (headline) */
+        .verdict-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .verdict-banner.verdict-good { background: #dcfce7; color: #15803d; border-bottom: 1px solid #bbf7d0; }
+        .verdict-banner.verdict-warn { background: #fef3c7; color: #b45309; border-bottom: 1px solid #fde68a; }
+        .verdict-banner.verdict-bad  { background: #fee2e2; color: #b91c1c; border-bottom: 1px solid #fecaca; }
+
+        /* History strip */
+        .history-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .history-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+        .history-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            font-size: 11px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .history-item:hover { background: #eef2ff; }
+        .history-item.active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+        .history-item .h-verdict { font-family: monospace; }
+        .history-item .h-verdict.good { color: #15803d; }
+        .history-item .h-verdict.warn { color: #b45309; }
+        .history-item .h-verdict.bad { color: #b91c1c; }
+        .history-item.active .h-verdict { color: inherit; }
+
+        /* Drop overlay */
+        .drop-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(79, 70, 229, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            pointer-events: none;
+            border: 3px dashed #4f46e5;
+        }
+        .drop-overlay-inner {
+            background: #fff;
+            padding: 28px 40px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #4f46e5;
+            box-shadow: 0 8px 30px rgba(15,23,42,0.2);
+        }
+        .drop-overlay-inner i { font-size: 36px; margin-bottom: 8px; display: block; }
+
+        /* =========================================
+           ENHANCEMENTS: states, toasts, a11y
+           ========================================= */
+        .btn-action:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn-action:focus-visible,
+        .select-input:focus-visible,
+        .tab:focus-visible,
+        .label-img-wrap:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: 2px;
+        }
+
+        .tab {
+            transition: background 0.15s, color 0.15s;
+        }
+        .tab:not(.active):hover {
+            background: #cbd5e1;
+        }
+
+        tbody tr:focus-visible {
+            outline: 2px solid #4f46e5;
+            outline-offset: -2px;
+        }
+
+        /* Slimmer, subtler scrollbars */
+        .table-container::-webkit-scrollbar,
+        .image-panel::-webkit-scrollbar { width: 8px; }
+        .table-container::-webkit-scrollbar-thumb,
+        .image-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover,
+        .image-panel::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Color-coded verification rate */
+        .stat-good { color: #15803d !important; }
+        .stat-warn { color: #b45309 !important; }
+        .stat-bad  { color: #b91c1c !important; }
+
+        /* Toast notifications */
+        #toast-container {
+            position: fixed;
+            top: 56px;
+            right: 16px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 360px;
+        }
+        .toast {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+            animation: toastIn 0.2s ease-out;
+            word-break: break-word;
+        }
+        .toast.error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .toast.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .toast.info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .toast .toast-close {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.6;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: 12px;
+            padding: 0 2px;
+        }
+        .toast .toast-close:hover { opacity: 1; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(12px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .toast.toast-out {
+            opacity: 0;
+            transform: translateX(12px);
+            transition: all 0.25s;
+        }
+
+        /* Friendly empty states */
+        .empty-state {
+            grid-column: span 2;
+            text-align: center;
+            padding: 48px 16px;
+            color: #94a3b8;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .empty-state i {
+            font-size: 26px;
+            color: #cbd5e1;
+        }
+
+        /* Hint inside the zoom modal */
+        .modal-hint {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Action Bar -->
+    <header class="top-action-bar">
+        <div class="brand-section">
+            <div class="brand-icon">
+                <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div class="brand-title">COLA Rapid QA Workspace</div>
+        </div>
+
+        <div class="controls-section">
+            <button id="btn-try-sample" class="btn-action btn-verify">
+                <i class="fa-solid fa-flask"></i> Try synthetic demo
+            </button>
+            <div class="btn-action btn-upload-wrap">
+                <i class="fa-solid fa-upload"></i> Upload PDF
+                <input type="file" id="file-input" accept=".pdf" />
+            </div>
+            <button id="btn-export-json" class="btn-action" style="background:#fff;border:1px solid #cbd5e1;color:#334155;" disabled title="Run an analysis first">
+                <i class="fa-solid fa-download"></i> JSON
+            </button>
+        </div>
+    </header>
+
+    <!-- Verdict banner (headline) -->
+    <div id="verdict-banner" class="verdict-banner" style="display:none;">
+        <span id="verdict-icon"></span>
+        <span id="verdict-text"></span>
+    </div>
+
+    <!-- History strip -->
+    <div id="history-strip" class="history-strip" style="display:none;">
+        <span class="history-label">Recent</span>
+        <div id="history-items" style="display:flex;gap:8px;"></div>
+    </div>
+
+    <!-- Top Info Cards -->
+    <div class="top-info-bar">
+        <div class="info-card">
+            <div class="info-card-label">TTB Application ID</div>
+            <div id="stat-ttb-id" class="info-card-value font-mono">--</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Brand Name</div>
+            <div id="stat-brand" class="info-card-value highlight">--</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Fanciful Name</div>
+            <div id="stat-fanciful" class="info-card-value">--</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Verification Rate</div>
+            <div id="stat-rate" class="info-card-value">0 Matches</div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-label">Extracted Labels</div>
+            <div id="stat-labels" class="info-card-value">0 Labels</div>
+        </div>
+    </div>
+
+    <!-- Loading Bar -->
+    <div id="loading-banner" class="loading-banner">
+        <i class="fa-solid fa-spinner fa-spin" style="color:#818cf8;"></i>
+        <span id="loading-text">Analyzing COLA PDF with MuPDF and Tesseract C++...</span>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="workspace">
+
+        <!-- Source document -->
+        <section class="pdf-panel">
+            <div class="pdf-panel-header">
+                <div class="pdf-panel-title">Source PDF</div>
+            </div>
+            <div class="pdf-viewer-wrap">
+                <div id="pdf-pages" class="pdf-pages" aria-label="Source PDF first page"></div>
+                <div id="pdf-empty" class="pdf-empty">
+                    <i class="fa-regular fa-file-pdf"></i>
+                    <span>Run a verification to inspect the source document beside its extracted evidence.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Center Panel: Compact Width Table -->
+        <section class="table-panel">
+            <div class="table-header">
+                <div class="table-title">
+                    <span>Application Form Fields</span>
+                </div>
+                <div class="filter-tabs">
+                    <div class="tab active" data-filter="MATCH" tabindex="0">Matches (<span id="count-match">0</span>)</div>
+                    <div class="tab" data-filter="MISS" tabindex="0">Missing (<span id="count-miss">0</span>)</div>
+                    <div class="tab" data-filter="all" tabindex="0">All (<span id="count-all">0</span>)</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Field Name</th>
+                            <th>Application States (Form)</th>
+                            <th>Label Shows (OCR Evidence)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qa-table-body">
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:40px;color:#94a3b8;">
+                                Select a sample PDF or upload an application above to verify.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Right Panel: Grid Label Gallery -->
+        <aside class="image-panel">
+            <div class="image-panel-header">
+                <div class="image-panel-title">Extracted Labels (<span id="label-count">0</span>)</div>
+                <span style="font-size:11px;color:#94a3b8;">Click ID row to highlight form + label</span>
+            </div>
+
+            <div id="labels-grid" class="labels-grid">
+                <div class="empty-state">
+                    <i class="fa-regular fa-images"></i>
+                    <span>No labels extracted yet — run a verification to see label images here.</span>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modal for zoom -->
+    <div id="zoom-modal" class="modal" style="display:none;" role="dialog" aria-modal="true" aria-label="Label zoom view">
+        <img id="modal-img" src="" alt="Zoomed label" />
+        <div class="modal-hint">Click anywhere or press Esc to close</div>
+    </div>
+
+    <!-- Drop overlay -->
+    <div id="drop-overlay" class="drop-overlay" style="display:none;">
+        <div class="drop-overlay-inner">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <div>Drop COLA PDF(s) to analyze</div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <script>
+        let currentAnalysisData = null;
+        let activeFilter = 'MATCH';
+        let isAnalyzing = false;
+        let activeNum = null;
+        let history = [];
+        let historyIndex = -1;
+
+        const MAX_UPLOAD_MB = 50;
+        const HISTORY_KEY = 'cola_qa_history_v2_synthetic';
+        const HISTORY_MAX = 10;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadHistory();
+            setupEventListeners();
+        });
+
+        async function trySample() {
+            if (isAnalyzing) return;
+            try {
+                const res = await fetch('/api/samples');
+                const data = await res.json();
+                const samples = (data && data.samples) || [];
+                if (samples.length === 0) {
+                        showToast('The synthetic demo PDF is unavailable on the server.', 'error');
+                    return;
+                }
+                const filename = samples[0].filename;
+                setAnalyzing(true, `Analyzing sample: ${filename}...`);
+                try {
+                    const formData = new FormData();
+                    formData.append('filename', filename);
+                    const r = await fetch('/api/analyze-sample', { method: 'POST', body: formData });
+                    if (!r.ok) throw new Error(await extractError(r));
+                    const result = await r.json();
+                    presentResult(result);
+                } finally {
+                    setAnalyzing(false);
+                }
+            } catch (err) {
+                showToast('Sample Error: ' + err.message, 'error');
+                setAnalyzing(false);
+            }
+        }
+
+        // ---- per-browser history (localStorage) ----
+        function loadHistory() {
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY);
+                history = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(history)) history = [];
+            } catch (e) {
+                history = [];
+            }
+            renderHistory();
+        }
+
+        function persistHistory() {
+            try {
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, HISTORY_MAX)));
+            } catch (e) { /* quota exceeded — keep in-memory only */ }
+        }
+
+        // Strip heavy base64 so stored entries stay under the localStorage quota
+        function slimForHistory(data) {
+            const slim = { ...data };
+            if (Array.isArray(slim.images)) {
+                slim.images = slim.images.map(({ base64, ...rest }) => rest);
+            }
+            delete slim.raw_stdout;
+            return slim;
+        }
+
+        function verdictTotal(data) {
+            const all = (data && data.matches) || [];
+            return all.filter(m => m.status !== 'SKIP' && m.status !== 'EMPTY').length;
+        }
+
+        function countByStatus(data, status) {
+            const all = (data && data.matches) || [];
+            return all.filter(m => m.status === status).length;
+        }
+
+        function saveHistoryEntry(data) {
+            const entry = {
+                filename: data.filename || data.ttb_id || 'analysis',
+                ttb_id: data.ttb_id || '',
+                ts: Date.now(),
+                match: countByStatus(data, 'MATCH'),
+                partial: countByStatus(data, 'PARTIAL'),
+                total: verdictTotal(data),
+                data: slimForHistory(data)
+            };
+            history = history.filter(item => item.filename !== entry.filename);
+            history.unshift(entry);
+            if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+            historyIndex = 0;
+            persistHistory();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const strip = document.getElementById('history-strip');
+            const items = document.getElementById('history-items');
+            if (!strip || !items) return;
+            if (history.length === 0) { strip.style.display = 'none'; return; }
+            strip.style.display = 'flex';
+            items.innerHTML = '';
+            history.forEach((h, i) => {
+                const div = document.createElement('div');
+                div.className = 'history-item' + (i === historyIndex ? ' active' : '');
+                const cls = h.total > 0 && h.match === h.total ? 'good' : (h.match > 0 ? 'warn' : 'bad');
+                div.innerHTML = `${escapeHtml(h.filename)} <span class="h-verdict ${cls}">${h.match}/${h.total}</span>`;
+                div.addEventListener('click', () => selectHistory(i));
+                items.appendChild(div);
+            });
+        }
+
+        function selectHistory(i) {
+            if (i < 0 || i >= history.length) return;
+            historyIndex = i;
+            const entry = history[i];
+            renderWorkspace(entry.data);
+            renderHistory();
+            showToast(`Restored ${entry.filename} from history.`, 'info');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btn-try-sample').addEventListener('click', async () => {
+                await trySample();
+            });
+
+            document.getElementById('file-input').addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files || []);
+                e.target.value = '';
+                await handleFiles(files);
+            });
+
+            setupDragDrop();
+
+            document.getElementById('btn-export-json').addEventListener('click', () => {
+                if (!currentAnalysisData) {
+                    showToast('Run an analysis before exporting.', 'info');
+                    return;
+                }
+                // Strip heavy base64 payloads so the export stays lightweight
+                const exportData = { ...currentAnalysisData };
+                if (Array.isArray(exportData.images)) {
+                    exportData.images = exportData.images.map(({ base64, ...rest }) => rest);
+                }
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cola_analysis_${currentAnalysisData.ttb_id || 'export'}.json`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast('Analysis JSON exported.', 'success');
+            });
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    activeFilter = tab.getAttribute('data-filter');
+                    renderTable();
+                });
+            });
+
+            document.getElementById('zoom-modal').addEventListener('click', closeZoom);
+
+            // Close modal with Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeZoom();
+            });
+
+            // Re-draw the active highlight if the layout changes (debounced)
+            let resizeTimer = null;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    fitDocumentPanel();
+                    if (activeNum !== null) selectRowAndHighlight(activeNum);
+                }, 150);
+            });
+        }
+
+        async function handleFiles(files) {
+            const pdfs = files.filter(f => f && f.name && f.name.toLowerCase().endsWith('.pdf'));
+            if (pdfs.length === 0) {
+                showToast('Only PDF files are supported.', 'error');
+                return;
+            }
+            for (const file of pdfs) {
+                if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
+                    showToast(`Skipped ${file.name} — too large (max ${MAX_UPLOAD_MB} MB).`, 'error');
+                    continue;
+                }
+                await uploadAndAnalyze(file);
+            }
+        }
+
+        function setupDragDrop() {
+            const overlay = document.getElementById('drop-overlay');
+            let dragDepth = 0;
+            window.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dragDepth++;
+                if (overlay) overlay.style.display = 'flex';
+            });
+            window.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            window.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragDepth--;
+                if (dragDepth <= 0) {
+                    dragDepth = 0;
+                    if (overlay) overlay.style.display = 'none';
+                }
+            });
+            window.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDepth = 0;
+                if (overlay) overlay.style.display = 'none';
+                const files = Array.from(e.dataTransfer ? e.dataTransfer.files : []);
+                if (files.length) handleFiles(files);
+            });
+        }
+
+        async function uploadAndAnalyze(file) {
+            setAnalyzing(true, `Analyzing ${file.name}...`);
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error(await extractError(res));
+                const data = await res.json();
+                presentResult(data);
+            } catch (err) {
+                showToast('Analysis Error: ' + err.message, 'error');
+            } finally {
+                setAnalyzing(false);
+            }
+        }
+
+        function presentResult(data) {
+            renderWorkspace(data);
+            saveHistoryEntry(data);
+            showToast(`Analysis complete — ${matchesSummary(data)}.`, 'success');
+        }
+
+        // Safely read an error message even if the server returned non-JSON
+        async function extractError(res) {
+            try {
+                const err = await res.json();
+                return err.detail || `Request failed (HTTP ${res.status})`;
+            } catch {
+                return `Request failed (HTTP ${res.status})`;
+            }
+        }
+
+        function matchesSummary(data) {
+            const match = countByStatus(data, 'MATCH');
+            const partial = countByStatus(data, 'PARTIAL');
+            const total = verdictTotal(data);
+            return `${match}/${total} fields match${partial ? ` (+${partial} partial)` : ''}`;
+        }
+
+        function updateVerdictBanner(match, partial, miss, total) {
+            const banner = document.getElementById('verdict-banner');
+            const icon = document.getElementById('verdict-icon');
+            const text = document.getElementById('verdict-text');
+            if (!banner || !icon || !text) return;
+            banner.style.display = 'flex';
+            banner.classList.remove('verdict-good', 'verdict-warn', 'verdict-bad');
+            if (total === 0) {
+                banner.classList.add('verdict-warn');
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                text.textContent = 'No fields to verify — is this a COLA application?';
+            } else if (match === total) {
+                banner.classList.add('verdict-good');
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                text.textContent = `All ${total} fields match.`;
+            } else if (match > 0) {
+                banner.classList.add('verdict-warn');
+                icon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                text.textContent = `${match}/${total} fields match${partial ? `, ${partial} partial` : ''}, ${miss} missing.`;
+            } else {
+                banner.classList.add('verdict-bad');
+                icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                text.textContent = `0/${total} fields match — ${miss} missing.`;
+            }
+        }
+
+        // Central busy-flag: blocks duplicate runs and toggles button states
+        function setAnalyzing(on, text) {
+            isAnalyzing = on;
+            if (on) showLoading(text || 'Analyzing COLA PDF...');
+            else hideLoading();
+            ['btn-try-sample', 'btn-export-json'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) b.disabled = on || (id === 'btn-export-json' && !currentAnalysisData);
+            });
+        }
+
+        function showLoading(text) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-banner').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-banner').style.display = 'none';
+        }
+
+        function cleanFieldName(rawQ, num) {
+            if (!rawQ) return `Field #${num}`;
+            let cleaned = rawQ.replace(/^\s*\d+[a-z]?\.\s*/i, '').trim();
+            if (cleaned.startsWith("NAME AND ADDRESS")) cleaned = "APPLICANT NAME & ADDRESS";
+            else if (cleaned.startsWith("SHOW ANY WORDING")) cleaned = "CONTAINER WORDING";
+            else if (cleaned.startsWith("TYPE OF APPLICATION")) cleaned = "APP TYPE";
+            else if (cleaned.startsWith("PLANT REGISTRY")) cleaned = "PLANT REGISTRY";
+            return cleaned;
+        }
+
+        function renderWorkspace(data) {
+            currentAnalysisData = data;
+
+            renderDocument(data);
+
+            const ttbEl = document.getElementById('stat-ttb-id');
+            ttbEl.textContent = data.ttb_id || 'N/A';
+            ttbEl.title = data.ttb_id || '';
+
+            let brand = '--';
+            let fanciful = '--';
+            if (Array.isArray(data.form_qa)) {
+                const brandObj = data.form_qa.find(q => (q.question || '').includes('BRAND'))
+                    || data.form_qa.find(q => q.num === '5');
+                if (brandObj && brandObj.answer) brand = brandObj.answer;
+
+                const fancifulObj = data.form_qa.find(q => (q.question || '').includes('FANCIFUL'))
+                    || data.form_qa.find(q => q.num === '6');
+                if (fancifulObj && fancifulObj.answer) fanciful = fancifulObj.answer;
+            }
+            const brandEl = document.getElementById('stat-brand');
+            brandEl.textContent = brand;
+            brandEl.title = brand;
+            const fancifulEl = document.getElementById('stat-fanciful');
+            fancifulEl.textContent = fanciful;
+            fancifulEl.title = fanciful;
+
+            const allItems = data.matches || [];
+            const matches = allItems.filter(item => item.status === 'MATCH');
+            const partials = allItems.filter(item => item.status === 'PARTIAL');
+            const misses = allItems.filter(item => item.status === 'NOT FOUND');
+            const total = allItems.filter(item => item.status !== 'SKIP' && item.status !== 'EMPTY').length;
+
+            const rateEl = document.getElementById('stat-rate');
+            rateEl.textContent = `${matches.length}/${total} Match`;
+            rateEl.classList.remove('stat-good', 'stat-warn', 'stat-bad');
+            if (total > 0) {
+                const ratio = matches.length / total;
+                rateEl.classList.add(ratio === 1 ? 'stat-good' : ratio >= 0.5 ? 'stat-warn' : 'stat-bad');
+            }
+            document.getElementById('count-match').textContent = matches.length;
+            document.getElementById('count-miss').textContent = misses.length;
+            document.getElementById('count-all').textContent = total;
+
+            updateVerdictBanner(matches.length, partials.length, misses.length, total);
+            requestAnimationFrame(() => fitDocumentPanel());
+
+            const imgCount = (data.images || []).length;
+            document.getElementById('stat-labels').textContent = `${imgCount} Labels`;
+            document.getElementById('label-count').textContent = imgCount;
+
+            // If the default "Matches" filter would show nothing, fall back to "All"
+            if (matches.length === 0 && total > 0 && activeFilter === 'MATCH') {
+                activeFilter = 'all';
+                document.querySelectorAll('.tab').forEach(t =>
+                    t.classList.toggle('active', t.getAttribute('data-filter') === 'all'));
+            }
+
+            activeNum = null;
+            renderTable();
+            renderImages(data.images || []);
+            document.getElementById('btn-export-json').disabled = false;
+
+            // Auto trigger first match
+            if (matches.length > 0) {
+                setTimeout(() => {
+                    selectRowAndHighlight(matches[0].num);
+                }, 100);
+            }
+        }
+
+        function renderDocument(data) {
+            const pagesEl = document.getElementById('pdf-pages');
+            const empty = document.getElementById('pdf-empty');
+            const viewer = document.querySelector('.pdf-viewer-wrap');
+            const pages = data && Array.isArray(data.document_pages)
+                ? data.document_pages.filter(page => page && page.url).slice(0, 1)
+                : [];
+
+            pagesEl.innerHTML = '';
+            if (!pages.length) {
+                viewer.style.removeProperty('--document-aspect');
+                document.querySelector('.pdf-panel').style.removeProperty('max-width');
+                empty.style.display = 'flex';
+                return;
+            }
+
+            empty.style.display = 'none';
+            const firstPage = pages[0];
+            if (firstPage.width > 0 && firstPage.height > 0) {
+                viewer.style.setProperty('--document-aspect', `${firstPage.width} / ${firstPage.height}`);
+            }
+            fitDocumentPanel(firstPage);
+            pages.forEach((page, index) => {
+                const card = document.createElement('article');
+                card.className = 'document-page-card';
+
+                const image = document.createElement('img');
+                image.src = String(page.url);
+                image.alt = `Source PDF page ${page.page || index + 1}`;
+                image.loading = 'eager';
+
+                const canvas = document.createElement('canvas');
+                canvas.className = 'form-highlight-canvas';
+                canvas.setAttribute('aria-hidden', 'true');
+
+                card.append(image, canvas);
+                pagesEl.appendChild(card);
+            });
+        }
+
+        function fitDocumentPanel(page = null) {
+            const panel = document.querySelector('.pdf-panel');
+            const workspace = document.querySelector('.workspace');
+            const header = panel && panel.querySelector('.pdf-panel-header');
+            const source = page || (currentAnalysisData && currentAnalysisData.document_pages
+                && currentAnalysisData.document_pages[0]);
+            if (!panel || !workspace || !header || !source) return;
+            const ratio = Number(source.width) / Number(source.height);
+            if (!Number.isFinite(ratio) || ratio <= 0) return;
+            const compact = window.matchMedia('(max-width: 980px)').matches;
+            const labelReserve = !compact && window.matchMedia('(max-width: 1100px)').matches
+                ? 190 : 0;
+            const viewportAvailable = Math.max(
+                200, window.innerHeight - workspace.getBoundingClientRect().top);
+            workspace.style.setProperty(
+                '--labels-max-height', compact ? 'none' : `${labelReserve || viewportAvailable}px`);
+            const availableHeight = compact
+                ? Math.max(360, window.innerHeight - 220)
+                : Math.max(
+                    200,
+                    viewportAvailable - header.offsetHeight - labelReserve - 14);
+            panel.style.maxWidth = `${Math.min(420, Math.floor(availableHeight * ratio))}px`;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('qa-table-body');
+            tbody.innerHTML = '';
+
+            if (!currentAnalysisData || !currentAnalysisData.matches) return;
+
+            let items = currentAnalysisData.matches;
+            if (activeFilter === 'MATCH') {
+                items = items.filter(item => item.status === 'MATCH');
+            } else if (activeFilter === 'MISS') {
+                items = items.filter(item => item.status === 'NOT FOUND' || item.status === 'PARTIAL');
+            }
+
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#94a3b8;">No rows for the current filter.</td></tr>';
+                return;
+            }
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.id = `row-item-${item.num}`;
+                tr.setAttribute('data-num', item.num);
+
+                const fieldTitle = cleanFieldName(item.question, item.num);
+                const appVal = item.answer || '';
+                const evidence = item.evidence || {};
+                const ocrVal = item.mandatory
+                    ? (item.mandatory_message || 'NOT SEEN - government warning is mandatory')
+                    : evidence.image === 'multiple'
+                    ? `Multiple OCR lines (${evidence.found_n || 0}/${evidence.of_n || 0} tokens)`
+                    : (evidence.line || '--');
+
+                let statusBadge;
+                if (item.mandatory && item.status === 'MATCH') {
+                    statusBadge = `<span class="status-badge mandatory-seen">Seen</span>`;
+                } else if (item.mandatory && item.status === 'PARTIAL') {
+                    statusBadge = `<span class="status-badge mandatory-incomplete">Incomplete</span>`;
+                } else if (item.mandatory) {
+                    statusBadge = `<span class="status-badge mandatory-missing">Not seen</span>`;
+                } else if (item.status === 'MATCH') {
+                    statusBadge = `<span class="status-badge match">Match</span>`;
+                } else if (item.status === 'PARTIAL') {
+                    statusBadge = `<span class="status-badge warn">Partial</span>`;
+                } else if (item.status === 'NOT FOUND') {
+                    statusBadge = `<span class="status-badge miss">Missing</span>`;
+                } else {
+                    statusBadge = `<span class="status-badge admin">N/A</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <button type="button" class="id-btn" title="Click to highlight on form and label">
+                            #${escapeHtml(item.num || '')}
+                        </button>
+                    </td>
+                    <td title="${escapeHtml(fieldTitle)}">${escapeHtml(fieldTitle)}</td>
+                    <td title="${escapeHtml(appVal)}">
+                        <input type="text" value="${escapeHtml(appVal)}" readonly style="cursor:default; background:#f8fafc;" />
+                    </td>
+                    <td title="${escapeHtml(ocrVal)}">
+                        <input type="text" class="ocr-val" value="${escapeHtml(ocrVal)}" readonly />
+                    </td>
+                    <td>${statusBadge}</td>
+                `;
+                if (item.mandatory) tr.classList.add('mandatory-row');
+
+                // Mouse + keyboard interaction
+                tr.tabIndex = 0;
+                tr.setAttribute('role', 'button');
+                tr.setAttribute('aria-label', `Highlight field ${item.num} on form and label`);
+                tr.addEventListener('click', () => selectRowAndHighlight(item.num));
+                tr.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectRowAndHighlight(item.num);
+                    }
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function selectRowAndHighlight(num) {
+            if (!currentAnalysisData || !currentAnalysisData.matches) return;
+
+            const matchItem = currentAnalysisData.matches.find(m => String(m.num) === String(num));
+            if (!matchItem) return;
+            activeNum = num;
+
+            // --- Highlight table row ---
+            document.querySelectorAll('#qa-table-body tr').forEach(row => row.classList.remove('selected-row'));
+            const activeTr = document.getElementById(`row-item-${num}`);
+            if (activeTr) {
+                activeTr.classList.add('selected-row');
+                activeTr.scrollIntoView({ block: 'nearest' });
+            }
+
+            highlightFormField(matchItem);
+
+            // --- Reset ALL label cards and clear every canvas ---
+            document.querySelectorAll('.label-card').forEach(c => c.classList.remove('active-target'));
+            document.querySelectorAll('.label-img-wrap canvas').forEach(cv => {
+                const ctx = cv.getContext('2d');
+                ctx.clearRect(0, 0, cv.width, cv.height);
+            });
+
+            // --- If the match has image evidence, draw highlight on canvas ---
+            const ev = matchItem.evidence;
+            if (!ev || !ev.image || !ev.found) return;
+
+            const safeImageId = safeIdOf(ev.image);
+            const targetCard = document.getElementById(`label-card-${safeImageId}`);
+            if (!targetCard) return;
+
+            targetCard.classList.add('active-target');
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Update the OCR snippet box
+            const snippetBox = targetCard.querySelector('.label-ocr-snippet-box');
+            if (snippetBox) {
+                const conf = ev.conf > 0 ? `${Math.round(ev.conf * 100)}% conf` : '';
+                snippetBox.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;color:#94a3b8;font-size:10px;margin-bottom:2px;">
+                        <span>🎯 Field #${num} — OCR Match</span>
+                        <span>${conf}</span>
+                    </div>
+                    <span class="ocr-highlight-chip">${escapeHtml(ev.line || '')}</span>
+                `;
+            }
+
+            // Draw highlight box on canvas if we have bbox coordinates
+            const x1 = ev.line_x1, y1 = ev.line_y1, x2 = ev.line_x2, y2 = ev.line_y2;
+            if ([x1, y1, x2, y2].some(v => v === undefined || v === null)) return; // no bbox available
+
+            const imgEl = targetCard.querySelector('.label-img-wrap img');
+            const canvas = targetCard.querySelector('.label-img-wrap canvas');
+            if (!imgEl || !canvas) return;
+
+            // The image may still be loading — wait for it
+            const doHighlight = () => {
+                // naturalWidth/Height = actual pixel dimensions of the PNG
+                const natW = imgEl.naturalWidth;
+                const natH = imgEl.naturalHeight;
+                // displayed size
+                const dispW = imgEl.clientWidth;
+                const dispH = imgEl.clientHeight;
+                if (natW === 0 || natH === 0 || dispW === 0 || dispH === 0) return;
+
+                // Because object-fit:contain, the image may be letterboxed.
+                // Calculate the actual rendered image rect within the element box.
+                const scale = Math.min(dispW / natW, dispH / natH);
+                const rendW = natW * scale;
+                const rendH = natH * scale;
+                const offX = (dispW - rendW) / 2; // horizontal offset (letterbox)
+                const offY = (dispH - rendH) / 2; // vertical offset (pillarbox)
+
+                // Map native pixel bbox to canvas coords
+                const cx1 = offX + x1 * scale;
+                const cy1 = offY + y1 * scale;
+                const cx2 = offX + x2 * scale;
+                const cy2 = offY + y2 * scale;
+
+                // Size canvas to match rendered element
+                canvas.width  = dispW;
+                canvas.height = dispH;
+
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, dispW, dispH);
+
+                // Soft yellow overlay behind the text row
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.30)';
+                ctx.fillRect(cx1 - 3, cy1 - 3, (cx2 - cx1) + 6, (cy2 - cy1) + 6);
+
+                // Bold yellow border around it
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(cx1 - 3, cy1 - 3, (cx2 - cx1) + 6, (cy2 - cy1) + 6);
+
+                // Tiny label tab at top-left of box
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`#${num}`, cx1, cy1 - 6 < 10 ? cy1 + 12 : cy1 - 6);
+            };
+
+            if (imgEl.complete && imgEl.naturalWidth > 0) {
+                doHighlight();
+            } else {
+                imgEl.addEventListener('load', doHighlight, { once: true });
+            }
+        }
+
+        function highlightFormField(matchItem) {
+            const canvas = document.querySelector('.form-highlight-canvas');
+            const image = document.querySelector('.document-page-card img');
+            if (!canvas || !image) return;
+
+            const qaEntry = (currentAnalysisData.form_qa || []).find(
+                entry => String(entry.num) === String(matchItem.num));
+            const bbox = matchItem.form_bbox || (qaEntry && qaEntry.bbox);
+
+            const draw = () => {
+                const dispW = image.clientWidth;
+                const dispH = image.clientHeight;
+                const natW = image.naturalWidth;
+                const natH = image.naturalHeight;
+                if (!dispW || !dispH || !natW || !natH) return;
+
+                canvas.width = dispW;
+                canvas.height = dispH;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, dispW, dispH);
+                if (!bbox) return;
+
+                const x1 = Number(bbox.x1) * dispW / natW;
+                const y1 = Number(bbox.y1) * dispH / natH;
+                const x2 = Number(bbox.x2) * dispW / natW;
+                const y2 = Number(bbox.y2) * dispH / natH;
+                if (![x1, y1, x2, y2].every(Number.isFinite)) return;
+
+                const pad = 5;
+                const left = Math.max(0, x1 - pad);
+                const top = Math.max(0, y1 - pad);
+                const width = Math.min(dispW - left, (x2 - x1) + pad * 2);
+                const height = Math.min(dispH - top, (y2 - y1) + pad * 2);
+
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.30)';
+                ctx.fillRect(left, top, width, height);
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(left, top, width, height);
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = 'bold 10px monospace';
+                ctx.fillText(`#${matchItem.num}`, left + 2, top > 12 ? top - 3 : top + 11);
+            };
+
+            if (image.complete && image.naturalWidth > 0) draw();
+            else image.addEventListener('load', draw, { once: true });
+        }
+
+        function renderImages(images) {
+            const grid = document.getElementById('labels-grid');
+            grid.innerHTML = '';
+
+            // Skip malformed entries that have no usable image source
+            const validImages = (images || []).filter(img => img && img.name && (img.base64 || img.url));
+
+            if (validImages.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-images"></i>
+                        <span>No embedded labels found in this document.</span>
+                    </div>`;
+                return;
+            }
+
+            validImages.forEach(img => {
+                const src = img.base64 || img.url;
+                const safeId = safeIdOf(img.name);
+                const card = document.createElement('div');
+                card.className = 'label-card';
+                card.id = `label-card-${safeId}`;
+
+                card.innerHTML = `
+                    <div class="label-card-header">
+                        <span title="${escapeHtml(img.name)}"><i class="fa-regular fa-image" style="margin-right:4px;"></i>${escapeHtml(img.name)}</span>
+                        <span style="color:#94a3b8;">${img.width || '?'}×${img.height || '?'}</span>
+                    </div>
+                    <div class="label-img-wrap" role="button" tabindex="0" aria-label="Zoom label ${escapeHtml(img.name)}">
+                        <img src="${src}" alt="${escapeHtml(img.name)}" loading="lazy" />
+                        <canvas></canvas>
+                    </div>
+                    <div class="label-ocr-snippet-box">
+                        <!-- Populated dynamically on ID click -->
+                    </div>
+                `;
+
+                // Listener-based zoom (avoids inline-onclick injection issues)
+                const wrap = card.querySelector('.label-img-wrap');
+                wrap.addEventListener('click', () => openZoom(src));
+                wrap.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openZoom(src);
+                    }
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Sanitize a filename into a safe DOM id (handles multiple dots/spaces/etc.)
+        function safeIdOf(name) {
+            return String(name || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        }
+
+        function openZoom(src) {
+            if (!src) return;
+            const modal = document.getElementById('zoom-modal');
+            document.getElementById('modal-img').src = src;
+            modal.style.display = 'flex';
+        }
+
+        function closeZoom() {
+            const modal = document.getElementById('zoom-modal');
+            if (!modal || modal.style.display === 'none') return;
+            modal.style.display = 'none';
+            // Release the (potentially huge base64) image from memory
+            document.getElementById('modal-img').src = '';
+        }
+
+        // Non-blocking toast notification (replaces alert())
+        function showToast(message, type = 'info', durationMs = 4500) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'error' ? 'fa-circle-exclamation'
+                       : type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}" style="margin-top:1px;"></i>
+                <span>${escapeHtml(message)}</span>
+                <button type="button" class="toast-close" aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            const dismiss = () => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 250);
+            };
+            toast.querySelector('.toast-close').addEventListener('click', dismiss);
+            container.appendChild(toast);
+            setTimeout(dismiss, durationMs);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
