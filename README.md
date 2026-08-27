@@ -2,7 +2,7 @@
 
 Compare a TTB COLA application with the text printed on its label images.
 
-**[Open the live website](https://violin-incidence-facilitate-remember.trycloudflare.com/)**
+**https://cola-rapid-qa.vercel.app/**
 
 ## Approach
 
