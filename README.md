@@ -2,17 +2,15 @@
 
 Compare a TTB COLA application with the text printed on its label images.
 
-**https://cola-rapid-qa.vercel.app/**
+Live demo: https://cola-rapid-qa.vercel.app/
 
 ## Approach
 
-This project does not use a large cloud vision model to read labels.
+Labels are read with local OCR (RapidOCR in the web app, Tesseract in the C++
+tool). Label text is plain print, so a cloud vision model would add cost and
+delay without much benefit, and it can give a confident wrong answer.
 
-Sending every document to a big vision model adds cost and delay, and it can
-give a confident wrong answer. Those models help with hard or unusual images.
-For checking the same plain text on label after label, OCR is enough.
-
-The demo does five things:
+How it works:
 
 1. Read the COLA application PDF.
 2. Extract the label images included with it.
@@ -20,9 +18,8 @@ The demo does five things:
 4. Compare that text with the important information on the application.
 5. Show the worker the evidence for each result.
 
-It does not approve or reject labels or make compliance decisions. It saves
-the reviewer from hunting for the same fields by hand, and the reviewer still
-makes the call.
+It doesn't approve or reject anything. It lines up each application field with
+the label text so a reviewer can check it faster.
 
 ## Next steps
 
@@ -34,7 +31,7 @@ makes the call.
 ## Try the demo
 
 Click **Try synthetic demo** to run the whole workflow on made-up application
-data. The `7/7` result comes from live OCR and matching, not a fixed value.
+data. The 7/7 score is computed by the OCR and matcher on every run.
 
 ![Synthetic demo workflow](docs/screenshots/demo-workflow.jpg)
 
@@ -52,15 +49,14 @@ warning is **Seen**, **Incomplete**, or **Not seen**.
 
 ## Hard cases
 
-If a match has a low confidence score, looks wrong, or needs a closer look,
-click **JSON** to download that analysis record.
+To save a questionable result, click **JSON** to download its analysis record.
 
 ![Export a difficult result as JSON for review](docs/screenshots/json-feedback-export.png)
 
 The file has the application fields, OCR text, match results and confidence
-scores for that case. A person marks what was right or wrong, and only those
-checked files go into the test or training set. That way the tool gets better
-from the office's own hard cases, on the office's schedule.
+scores for that case. Have a person mark what was right or wrong before any of
+these files go into a test or training set, so the tool improves from the
+office's own hard cases.
 
 ## Layout
 
@@ -72,24 +68,22 @@ from the office's own hard cases, on the office's schedule.
 
 ## Run it
 
-You need Python 3.11, CMake, MuPDF, and Tesseract installed first.
-
-Run these commands one at a time in Terminal:
+macOS with Homebrew. Install Python 3.11, CMake, MuPDF and Tesseract first.
 
 ```bash
-# Make a private Python setup for this project
+# create a virtualenv
 python3.11 -m venv .venv
 
-# Install what the website needs
+# install Python dependencies (includes RapidOCR)
 .venv/bin/python -m pip install -r web/requirements.lock
 
-# Build the label-reading program
+# build the C++ analyzer
 MUPDF_ROOT="$(brew --prefix mupdf)" cmake -S native -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 install -d bin
 install -m 0755 build/cola_label_qa bin/cola_label_qa
 
-# Start the website
+# start the web app
 PORT=8080 ./scripts/start_web.sh
 ```
 
@@ -101,7 +95,7 @@ Then open `http://127.0.0.1:8080`.
 # Run the tests
 .venv/bin/python -m unittest discover -s tests -v
 
-# Try the included example
+# run the C++ analyzer on the demo PDF
 ./bin/cola_label_qa samples/demo-cola.pdf --task both --json --out build/sample-images
 ```
 

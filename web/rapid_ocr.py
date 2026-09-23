@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""rapid_ocr.py — RapidOCR OCR + the COLA label matching logic.
+"""rapid_ocr.py: RapidOCR OCR plus the COLA label matching logic.
 
 This replaces the C++ binary's Tesseract OCR stage. The C++ binary still does
 stage 1 (MuPDF: extract page text, parse the page-1 form Q&A, and dump embedded
@@ -11,8 +11,8 @@ label images). This module then:
      match_answer / match_class_type), so verdicts are identical to the
      Tesseract path but ~3x faster.
 
-The matching code below is a line-for-line port of the C++ stage 2. Do not
-"improve" it — the point is bit-identical verdicts.
+The matching code below is a line-for-line port of the C++ stage 2. Keep it
+in sync with the C++ version so both give identical verdicts.
 """
 
 import re
