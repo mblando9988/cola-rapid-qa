@@ -6,7 +6,7 @@ is managed by `cola-qa.service`; the Cloudflare quick tunnel has a separate
 
 ## Build a locked Python environment
 
-Python 3.11 is the deployment contract:
+The server uses Python 3.11:
 
 ```bash
 cd /home/vpcuser/cola-qa
@@ -27,9 +27,9 @@ install -d bin
 install -m 0755 build/cola_label_qa bin/cola_label_qa
 ```
 
-Run the unit tests and the fixed sample before replacing the active binary or
-environment. Keep the previous active binary and environment until the new
-service returns healthy and the sample result is compared.
+Run the unit tests and the sample before swapping in the new binary or
+environment. Keep the old binary and environment until the new service is
+healthy and its sample result matches.
 
 ## Install the service
 
@@ -49,15 +49,15 @@ sudo systemctl restart cloudflared-tunnel.service
 sudo journalctl -u cloudflared-tunnel.service -n 50 --no-pager
 ```
 
-## Deployment receipt
+## Record what was deployed
 
-Record the source commit in the Git worktree before deployment:
+Before deploying, note the source commit:
 
 ```bash
 git rev-parse HEAD
 ```
 
-Then record the deployed hashes and runtime on the VM:
+Then note the file hashes and Python setup on the VM:
 
 ```bash
 sha256sum web/requirements.lock web/app.py web/rapid_ocr.py \
@@ -67,12 +67,12 @@ sha256sum bin/cola_label_qa samples/sample-cola.pdf
 .venv/bin/python -m pip freeze
 ```
 
-The service creates run data under `web_runs/`. Run data is disposable after
-its retention period; source PDFs used for regression must live under
-`samples/regression/` with hashes in the manifest.
+The service writes run data to `web_runs/`, which can be cleared after the
+retention period. PDFs used for regression tests go in `samples/regression/`
+with their hashes in the manifest.
 
 ## Rollback
 
-Rollback means restoring the single previous accepted source snapshot, binary,
-and virtual environment together, then restarting `cola-qa.service`. Never mix
-an older binary with unrecorded source or dependency state.
+To roll back, restore the previous source, binary and virtual environment
+together, then restart `cola-qa.service`. Don't mix an old binary with newer
+source or dependencies.

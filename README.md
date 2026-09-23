@@ -6,16 +6,13 @@ Compare a TTB COLA application with the text printed on its label images.
 
 ## Approach
 
-This project intentionally avoids using a large cloud vision model as the main
-way to read labels.
+This project does not use a large cloud vision model to read labels.
 
-For a basic OCR task, sending every document to a large vision model can add
-cost, delay, and the risk of a confident but incorrect answer. Those models
-can be useful for harder visual problems or unusual cases, especially when a
-reliable foundational model can run locally. They are not the right default for
-repeatedly checking simple text on a label.
+Sending every document to a big vision model adds cost and delay, and it can
+give a confident wrong answer. Those models help with hard or unusual images.
+For checking the same plain text on label after label, OCR is enough.
 
-Instead, this demo uses a focused document-to-label workflow:
+The demo does five things:
 
 1. Read the COLA application PDF.
 2. Extract the label images included with it.
@@ -23,31 +20,21 @@ Instead, this demo uses a focused document-to-label workflow:
 4. Compare that text with the important information on the application.
 5. Show the worker the evidence for each result.
 
-This is not automation. It does not approve or reject a label, replace a
-reviewer, or make a compliance decision. It is a tool meant to save workers
-from repeatedly searching for the same obvious information by hand, while
-leaving the final judgment with the person doing the review.
+It does not approve or reject labels or make compliance decisions. It saves
+the reviewer from hunting for the same fields by hand, and the reviewer still
+makes the call.
 
-## What would turn this from a demo into an office tool
+## Next steps
 
-The next improvements should focus on the worker's actual environment, not on
-adding unnecessary AI:
-
-- Better image preparation, including super-resolution training, for blurry,
-  low-quality, or difficult label images.
-- A stronger workspace with clearer drag-and-drop handling and a smoother
-  review flow.
-- Integration into the office's existing .NET architecture, so the tool fits
-  into the systems workers already use.
-
-The goal is simple: make routine review faster and easier without taking
-judgment away from the reviewer.
+- Better cleanup of blurry or low-quality label images, including a trained
+  super-resolution step.
+- Easier drag-and-drop and a faster review screen.
+- Hooking it into the office's existing .NET systems.
 
 ## Try the demo
 
-Click **Try synthetic demo** to run the complete workflow with fictional
-application data. The `7/7` result is calculated live by OCR and matching; it
-is not hardcoded.
+Click **Try synthetic demo** to run the whole workflow on made-up application
+data. The `7/7` result comes from live OCR and matching, not a fixed value.
 
 ![Synthetic demo workflow](docs/screenshots/demo-workflow.jpg)
 
@@ -63,32 +50,25 @@ warning is **Seen**, **Incomplete**, or **Not seen**.
 
 ![Mandatory government warning check](docs/screenshots/government-warning-detail.jpg)
 
-## Improve from difficult cases
+## Hard cases
 
 If a match has a low confidence score, looks wrong, or needs a closer look,
 click **JSON** to download that analysis record.
 
 ![Export a difficult result as JSON for review](docs/screenshots/json-feedback-export.png)
 
-The export preserves the application fields, OCR evidence, match results, and
-confidence values from that specific case. Save it for review, then have a
-person mark what was correct or incorrect. A downloaded OCR result is not
-training truth by itself: only reviewed and corrected exports should be added
-to an evaluation or training set.
-
-This gives the office a feedback loop based on its own work. A narrow issue can
-be addressed in days, recurring patterns can be collected over weeks, and an
-approved history of difficult cases can support improvements over months. The
-office controls the priorities and timing instead of waiting for a generic
-outside model or vendor update.
+The file has the application fields, OCR text, match results and confidence
+scores for that case. A person marks what was right or wrong, and only those
+checked files go into the test or training set. That way the tool gets better
+from the office's own hard cases, on the office's schedule.
 
 ## Layout
 
-- `native/` — C++ analyzer and its bundled headers
-- `web/` — FastAPI application, OCR matcher, UI template, and Python manifests
-- `scripts/` — local launch tooling
-- `deploy/` — Docker Compose, Dockerfile, and systemd assets
-- `docs/` — operational documentation and screenshots
+- `native/`: C++ analyzer and its bundled headers
+- `web/`: FastAPI app, OCR matcher, UI template and Python requirements
+- `scripts/`: local start scripts
+- `deploy/`: Docker Compose, Dockerfile and systemd files
+- `docs/`: deployment notes and screenshots
 
 ## Run it
 
@@ -118,7 +98,7 @@ Then open `http://127.0.0.1:8080`.
 ## Check that it works
 
 ```bash
-# Run the safety checks
+# Run the tests
 .venv/bin/python -m unittest discover -s tests -v
 
 # Try the included example

@@ -339,10 +339,10 @@
         }
 
         thead th:nth-child(1) { width: 40px; text-align: center; } /* ID */
-        thead th:nth-child(2) { width: 1%; white-space: nowrap; }   /* Field Name — shrink to content */
-        thead th:nth-child(3) { }                                     /* Form Value — natural width */
-        thead th:nth-child(4) { }                                     /* OCR Evidence — natural width */
-        thead th:nth-child(5) { width: 1%; white-space: nowrap; }   /* Status — shrink to content */
+        thead th:nth-child(2) { width: 1%; white-space: nowrap; }   /* Field Name: shrink to content */
+        thead th:nth-child(3) { }                                     /* Form Value: natural width */
+        thead th:nth-child(4) { }                                     /* OCR Evidence: natural width */
+        thead th:nth-child(5) { width: 1%; white-space: nowrap; }   /* Status: shrink to content */
 
         tbody tr {
             border-bottom: 1px solid #f1f5f9;
@@ -610,7 +610,7 @@
             display: block;
             width: 100%;
             height: auto;
-            max-height: 220px;      /* moderate — not tiny, not massive */
+            max-height: 220px;      /* medium height */
             object-fit: contain;
             background: #fff;
         }
@@ -1022,7 +1022,7 @@
             <div id="labels-grid" class="labels-grid">
                 <div class="empty-state">
                     <i class="fa-regular fa-images"></i>
-                    <span>No labels extracted yet — run a verification to see label images here.</span>
+                    <span>No labels extracted yet. Run a verification to see them here.</span>
                 </div>
             </div>
         </aside>
@@ -1106,7 +1106,7 @@
         function persistHistory() {
             try {
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, HISTORY_MAX)));
-            } catch (e) { /* quota exceeded — keep in-memory only */ }
+            } catch (e) { /* storage full: keep in memory only */ }
         }
 
         // Strip heavy base64 so stored entries stay under the localStorage quota
@@ -1241,7 +1241,7 @@
             }
             for (const file of pdfs) {
                 if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
-                    showToast(`Skipped ${file.name} — too large (max ${MAX_UPLOAD_MB} MB).`, 'error');
+                    showToast(`Skipped ${file.name}: too large (max ${MAX_UPLOAD_MB} MB).`, 'error');
                     continue;
                 }
                 await uploadAndAnalyze(file);
@@ -1295,7 +1295,7 @@
         function presentResult(data) {
             renderWorkspace(data);
             saveHistoryEntry(data);
-            showToast(`Analysis complete — ${matchesSummary(data)}.`, 'success');
+            showToast(`Analysis complete: ${matchesSummary(data)}.`, 'success');
         }
 
         // Safely read an error message even if the server returned non-JSON
@@ -1325,7 +1325,7 @@
             if (total === 0) {
                 banner.classList.add('verdict-warn');
                 icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-                text.textContent = 'No fields to verify — is this a COLA application?';
+                text.textContent = 'No fields to verify. Is this a COLA application?';
             } else if (match === total) {
                 banner.classList.add('verdict-good');
                 icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
@@ -1337,7 +1337,7 @@
             } else {
                 banner.classList.add('verdict-bad');
                 icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-                text.textContent = `0/${total} fields match — ${miss} missing.`;
+                text.textContent = `0/${total} fields match, ${miss} missing.`;
             }
         }
 
@@ -1629,7 +1629,7 @@
                 const conf = ev.conf > 0 ? `${Math.round(ev.conf * 100)}% conf` : '';
                 snippetBox.innerHTML = `
                     <div style="display:flex;justify-content:space-between;color:#94a3b8;font-size:10px;margin-bottom:2px;">
-                        <span>🎯 Field #${num} — OCR Match</span>
+                        <span>Field #${num}: OCR match</span>
                         <span>${conf}</span>
                     </div>
                     <span class="ocr-highlight-chip">${escapeHtml(ev.line || '')}</span>
@@ -1644,7 +1644,7 @@
             const canvas = targetCard.querySelector('.label-img-wrap canvas');
             if (!imgEl || !canvas) return;
 
-            // The image may still be loading — wait for it
+            // The image may still be loading, so wait for it
             const doHighlight = () => {
                 // naturalWidth/Height = actual pixel dimensions of the PNG
                 const natW = imgEl.naturalWidth;

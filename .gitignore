@@ -10,7 +10,5 @@ static/
 samples/**/*.pdf
 !samples/demo-cola.pdf
 samples/cola_analysis.json
-.serena/cache/
-.serena/memories/
-.serena/project.local.yml
+.serena/
 *.log
